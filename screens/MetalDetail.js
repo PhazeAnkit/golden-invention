@@ -9,12 +9,14 @@ import {
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import colors from "../theme/colors";
+import { usePortfolio } from "../context/PortfolioContext";
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function MetalDetailScreen({ route, navigation }) {
   const { metal } = route.params;
   const [range, setRange] = useState("1D");
+  const { transactions } = usePortfolio();
 
   const priceHistory = [
     { x: 1, y: 1800 },
@@ -23,13 +25,12 @@ export default function MetalDetailScreen({ route, navigation }) {
     { x: 4, y: 1820 },
   ];
 
-  const recentTransactions = [
-    { id: "1", type: "Buy", qty: "2g", value: "$120", date: "2025-08-20" },
-    { id: "2", type: "Sell", qty: "1g", value: "$60", date: "2025-08-22" },
-  ];
+  // filter only this metal's transactions
+  const metalTxns = transactions.filter((t) => t.metal === metal.name);
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>←</Text>
@@ -40,11 +41,13 @@ export default function MetalDetailScreen({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
+      {/* Price */}
       <Text style={styles.price}>${metal.price}</Text>
       <Text style={styles.change}>
         {metal.change > 0 ? `+${metal.change}%` : `${metal.change}%`}
       </Text>
 
+      {/* Chart */}
       <LineChart
         data={{
           labels: priceHistory.map((p) => p.x.toString()),
@@ -70,6 +73,7 @@ export default function MetalDetailScreen({ route, navigation }) {
         style={styles.chart}
       />
 
+      {/* Range selector */}
       <View style={styles.rangeContainer}>
         {["1D", "1W", "1M", "1Y"].map((r) => (
           <TouchableOpacity
@@ -82,6 +86,7 @@ export default function MetalDetailScreen({ route, navigation }) {
         ))}
       </View>
 
+      {/* Buy / Sell */}
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={[styles.actionBtn, { backgroundColor: colors.primary }]}
@@ -97,9 +102,10 @@ export default function MetalDetailScreen({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
+      {/* Recent Transactions */}
       <Text style={styles.sectionTitle}>Recent Transactions</Text>
       <FlatList
-        data={recentTransactions}
+        data={metalTxns}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.txnRow}>
@@ -110,11 +116,16 @@ export default function MetalDetailScreen({ route, navigation }) {
             >
               {item.type}
             </Text>
-            <Text>{item.qty}</Text>
-            <Text>{item.value}</Text>
+            <Text>{item.qty}g</Text>
+            <Text>${item.value.toFixed(2)}</Text>
             <Text style={{ color: "#aaa" }}>{item.date}</Text>
           </View>
         )}
+        ListEmptyComponent={
+          <Text style={{ color: "#777", textAlign: "center" }}>
+            No transactions yet.
+          </Text>
+        }
       />
     </View>
   );

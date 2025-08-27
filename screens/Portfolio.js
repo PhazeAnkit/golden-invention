@@ -1,33 +1,32 @@
-// screens/Portfolio.js
 import React from "react";
-import { View, Text, StyleSheet, FlatList, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import colors from "../theme/colors";
+import { usePortfolio } from "../context/PortfolioContext";
 
-export default function PortfolioScreen() {
-  // Fake holdings (later, update via Buy/Sell flow)
-  const holdings = [
-    { name: "Gold", qty: 10, avgBuy: 1850, currentPrice: 1925 },
-    { name: "Silver", qty: 200, avgBuy: 22, currentPrice: 23.5 },
-    { name: "Platinum", qty: 5, avgBuy: 870, currentPrice: 890 },
-  ];
+export default function PortfolioScreen({ navigation }) {
+  const { holdings } = usePortfolio();
 
-  // Portfolio value and growth data
   const totalValue = holdings.reduce(
     (sum, m) => sum + m.qty * m.currentPrice,
     0
   );
 
-  const portfolioGrowth = [2000, 2500, 2700, 2600, 3000, totalValue]; // fake history
+  const portfolioGrowth = [2000, 2500, 2700, 2600, 3000, totalValue];
 
   return (
     <View style={styles.container}>
-      {/* Portfolio summary */}
       <Text style={styles.heading}>My Portfolio</Text>
       <Text style={styles.value}>${totalValue.toFixed(2)}</Text>
       <Text style={styles.subText}>Total Value</Text>
 
-      {/* Small Chart */}
       <LineChart
         data={{
           labels: ["Jan", "Feb", "Mar", "Apr", "May", "Now"],
@@ -48,7 +47,6 @@ export default function PortfolioScreen() {
         style={styles.chart}
       />
 
-      {/* Holdings List */}
       <FlatList
         data={holdings}
         keyExtractor={(item) => item.name}
@@ -59,7 +57,12 @@ export default function PortfolioScreen() {
           const profitPct = ((profit / invested) * 100).toFixed(2);
 
           return (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate("MetalDetail", { metal: item })
+              }
+            >
               <Text style={styles.metal}>{item.name}</Text>
               <Text style={styles.detail}>Qty: {item.qty}</Text>
               <Text style={styles.detail}>
@@ -76,7 +79,7 @@ export default function PortfolioScreen() {
               >
                 P/L: ${profit.toFixed(2)} ({profitPct}%)
               </Text>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />

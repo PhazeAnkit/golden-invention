@@ -11,6 +11,8 @@ import LoginScreen from "./screens/Login";
 import SignupScreen from "./screens/Signup";
 import colors from "./theme/colors";
 import MetalDetailScreen from "./screens/MetalDetail";
+import BuyScreen from "./screens/Buy";
+import SellScreen from "./screens/Sell";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -77,6 +79,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Auth" component={AuthNavigator} />
       <Stack.Screen name="Main" component={TabNavigator} />
       <Stack.Screen name="MetalDetail" component={MetalDetailScreen} />
+      <Stack.Screen name="Buy" component={BuyScreen} />
+      <Stack.Screen name="Sell" component={SellScreen} />
     </Stack.Navigator>
   );
 }
