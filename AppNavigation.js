@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import DashboardScreen from "./screens/DashboardScreen";
+import DashboardScreen from "./components/Dashboard";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "./theme/colors";
 
