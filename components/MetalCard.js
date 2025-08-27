@@ -24,10 +24,10 @@ const MetalCard = ({ metal, price, change, onPress }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 16,
-    margin: 8,
-    width: 160,
+    marginBottom: 16,
+    width: "47%",
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
