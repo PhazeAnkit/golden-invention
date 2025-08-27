@@ -7,6 +7,7 @@ import colors from "./theme/colors";
 import Icon from "react-native-vector-icons/Ionicons";
 import PortfolioScreen from "./screens/Portfolio";
 import AIHelperScreen from "./screens/AIHelper";
+import SplashScreen from "./screens/Splash";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -81,6 +82,7 @@ function TabNavigator() {
 export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Main" component={TabNavigator} />
     </Stack.Navigator>
   );
