@@ -5,7 +5,7 @@ import colors from "../theme/colors";
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
     setTimeout(() => {
-      navigation.replace("Main");
+      navigation.replace("Auth");
     }, 2000);
   }, []);
 

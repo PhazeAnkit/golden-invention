@@ -1,26 +1,26 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import DashboardScreen from "./screens/Dashboard";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import colors from "./theme/colors";
 import Icon from "react-native-vector-icons/Ionicons";
+
+import DashboardScreen from "./screens/Dashboard";
 import PortfolioScreen from "./screens/Portfolio";
 import AIHelperScreen from "./screens/AIHelper";
 import SplashScreen from "./screens/Splash";
+import LoginScreen from "./screens/Login";
+import SignupScreen from "./screens/Signup";
+import colors from "./theme/colors";
 
-const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
 
-function CustomAIButton({ children, onPress }) {
+function AuthNavigator() {
   return (
-    <TouchableOpacity
-      style={styles.aiButton}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      {children}
-    </TouchableOpacity>
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Signup" component={SignupScreen} />
+    </AuthStack.Navigator>
   );
 }
 
@@ -42,37 +42,21 @@ function TabNavigator() {
         name="Dashboard"
         component={DashboardScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home-outline" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="home-outline" color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="AIHelper"
         component={AIHelperScreen}
         options={{
-          tabBarLabel: "",
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              name="sparkles-outline"
-              color={focused ? "#fff" : "#000"}
-              size={28}
-            />
-          ),
-          tabBarButton: (props) => (
-            <CustomAIButton {...props}>
-              <Icon name="sparkles" color="#fff" size={28} />
-            </CustomAIButton>
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="sparkles-outline" color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="Portfolio"
         component={PortfolioScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="pie-chart-outline" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="pie-chart-outline" color={color} size={size} />,
         }}
       />
     </Tab.Navigator>
@@ -83,23 +67,8 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="Auth" component={AuthNavigator} />
       <Stack.Screen name="Main" component={TabNavigator} />
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  aiButton: {
-    top: -20,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.primary,
-    width: 65,
-    height: 65,
-    borderRadius: 40,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-});
