@@ -10,6 +10,7 @@ import SplashScreen from "./screens/Splash";
 import LoginScreen from "./screens/Login";
 import SignupScreen from "./screens/Signup";
 import colors from "./theme/colors";
+import MetalDetailScreen from "./screens/MetalDetail";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
