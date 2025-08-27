@@ -42,21 +42,27 @@ function TabNavigator() {
         name="Dashboard"
         component={DashboardScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Icon name="home-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="home-outline" color={color} size={size} />
+          ),
         }}
       />
       <Tab.Screen
         name="AIHelper"
         component={AIHelperScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Icon name="sparkles-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="sparkles-outline" color={color} size={size} />
+          ),
         }}
       />
       <Tab.Screen
         name="Portfolio"
         component={PortfolioScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Icon name="pie-chart-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="pie-chart-outline" color={color} size={size} />
+          ),
         }}
       />
     </Tab.Navigator>
@@ -69,6 +75,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Auth" component={AuthNavigator} />
       <Stack.Screen name="Main" component={TabNavigator} />
+      <Stack.Screen name="MetalDetail" component={MetalDetailScreen} />
     </Stack.Navigator>
   );
 }
