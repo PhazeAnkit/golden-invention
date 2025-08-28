@@ -3,30 +3,33 @@ import React, { createContext, useContext, useState } from "react";
 const PortfolioContext = createContext();
 
 export const PortfolioProvider = ({ children }) => {
-  const [holdings, setHoldings] = useState({});
+  const [holdings, setHoldings] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
-  const buyMetal = (metal, qty) => {
-    const cost = metal.price * qty;
+  const buyMetal = (metal, qtyRaw) => {
+    const qty = Number(qtyRaw) || 0;
+    const price = Number(metal.price) || 0;
+    if (qty <= 0 || price <= 0) return;
 
-    // Update holdings
+    const cost = price * qty;
+
     setHoldings((prev) => {
-      const prevQty = prev[metal.name]?.qty || 0;
-      const prevCost = prev[metal.name]?.totalCost || 0;
-
-      const newQty = prevQty + qty;
-      const newTotalCost = prevCost + cost;
-
-      return {
+      const existing = prev.find((h) => h.name === metal.name);
+      if (existing) {
+        const updated = {
+          ...existing,
+          qty: existing.qty + qty,
+          totalCost: existing.totalCost + cost,
+          currentPrice: price,
+        };
+        return prev.map((h) => (h.name === metal.name ? updated : h));
+      }
+      return [
         ...prev,
-        [metal.name]: {
-          qty: newQty,
-          totalCost: newTotalCost,
-        },
-      };
+        { name: metal.name, qty, totalCost: cost, currentPrice: price },
+      ];
     });
 
-    // Add transaction
     setTransactions((prev) => [
       {
         id: Date.now().toString(),
@@ -40,33 +43,37 @@ export const PortfolioProvider = ({ children }) => {
     ]);
   };
 
-  const sellMetal = (metal, qty) => {
-    const value = metal.price * qty;
+  const sellMetal = (metal, qtyRaw) => {
+    const qty = Number(qtyRaw) || 0;
+    const price = Number(metal.price) || 0;
+    if (qty <= 0 || price <= 0) return;
 
     setHoldings((prev) => {
-      const prevQty = prev[metal.name]?.qty || 0;
-      const prevCost = prev[metal.name]?.totalCost || 0;
+      const existing = prev.find((h) => h.name === metal.name);
+      if (!existing || existing.qty <= 0) return prev;
 
-      const newQty = Math.max(prevQty - qty, 0);
-      const newTotalCost = prevCost * (newQty / (prevQty || 1)); // proportional cost left
+      const sellQty = Math.min(qty, existing.qty);
+      const newQty = existing.qty - sellQty;
+      const newTotalCost =
+        existing.qty === 0 ? 0 : existing.totalCost * (newQty / existing.qty);
 
-      return {
-        ...prev,
-        [metal.name]: {
-          qty: newQty,
-          totalCost: newTotalCost,
-        },
+      const updated = {
+        ...existing,
+        qty: newQty,
+        totalCost: newTotalCost,
+        currentPrice: price,
       };
+
+      return prev.map((h) => (h.name === metal.name ? updated : h));
     });
 
-    // Add transaction
     setTransactions((prev) => [
       {
         id: Date.now().toString(),
         type: "Sell",
         metal: metal.name,
         qty,
-        value,
+        value: price * qty,
         date: new Date().toISOString().split("T")[0],
       },
       ...prev,

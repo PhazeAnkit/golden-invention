@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -16,17 +16,20 @@ const screenWidth = Dimensions.get("window").width;
 export default function MetalDetailScreen({ route, navigation }) {
   const { metal } = route.params;
   const [range, setRange] = useState("1D");
-  const { transactions } = usePortfolio();
+  const { holdings, transactions } = usePortfolio();
 
-  const priceHistory = [
-    { x: 1, y: 1800 },
-    { x: 2, y: 1810 },
-    { x: 3, y: 1790 },
-    { x: 4, y: 1820 },
-  ];
+  const holding = holdings.find((h) => h.name === metal.name);
+  const currentPrice = Number(holding?.currentPrice ?? metal.price) || 0;
+  const ownedQty = Number(holding?.qty) || 0;
+  const invested = Number(holding?.totalCost) || 0;
+  const avgBuy = ownedQty > 0 ? invested / ownedQty : 0;
 
-  // filter only this metal's transactions
-  const metalTxns = transactions.filter((t) => t.metal === metal.name);
+  const metalTxns = useMemo(
+    () => transactions.filter((t) => t.metal === metal.name),
+    [transactions, metal.name]
+  );
+
+  const priceHistory = [1800, 1810, 1790, 1820, 1812, currentPrice || 1805];
 
   return (
     <View style={styles.container}>
@@ -36,13 +39,11 @@ export default function MetalDetailScreen({ route, navigation }) {
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{metal.name}</Text>
-        <TouchableOpacity>
-          <Text style={styles.favorite}>⭐</Text>
-        </TouchableOpacity>
+        <View style={{ width: 20 }} />
       </View>
 
       {/* Price */}
-      <Text style={styles.price}>${metal.price}</Text>
+      <Text style={styles.price}>${currentPrice.toFixed(2)}</Text>
       <Text style={styles.change}>
         {metal.change > 0 ? `+${metal.change}%` : `${metal.change}%`}
       </Text>
@@ -50,8 +51,8 @@ export default function MetalDetailScreen({ route, navigation }) {
       {/* Chart */}
       <LineChart
         data={{
-          labels: priceHistory.map((p) => p.x.toString()),
-          datasets: [{ data: priceHistory.map((p) => p.y) }],
+          labels: ["1", "2", "3", "4", "5", "Now"],
+          datasets: [{ data: priceHistory }],
         }}
         width={screenWidth - 32}
         height={220}
@@ -61,19 +62,15 @@ export default function MetalDetailScreen({ route, navigation }) {
           backgroundGradientFrom: "#111",
           backgroundGradientTo: "#111",
           decimalPlaces: 2,
-          color: (opacity = 1) => colors.primary,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          propsForDots: {
-            r: "4",
-            strokeWidth: "2",
-            stroke: colors.primary,
-          },
+          color: () => colors.primary,
+          labelColor: (opacity = 1) => `rgba(255,255,255,${opacity})`,
+          propsForDots: { r: "4", strokeWidth: "2", stroke: colors.primary },
         }}
         bezier
         style={styles.chart}
       />
 
-      {/* Range selector */}
+      {/* Range */}
       <View style={styles.rangeContainer}>
         {["1D", "1W", "1M", "1Y"].map((r) => (
           <TouchableOpacity
@@ -86,17 +83,32 @@ export default function MetalDetailScreen({ route, navigation }) {
         ))}
       </View>
 
+      {/* Position summary */}
+      <View style={styles.position}>
+        <Text style={styles.posText}>Owned: {ownedQty}</Text>
+        <Text style={styles.posText}>Avg Buy: ${avgBuy.toFixed(2)}</Text>
+        <Text style={styles.posText}>Invested: ${invested.toFixed(2)}</Text>
+      </View>
+
       {/* Buy / Sell */}
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={[styles.actionBtn, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate("Buy", { metal })}
+          onPress={() =>
+            navigation.navigate("Buy", {
+              metal: { name: metal.name, price: currentPrice },
+            })
+          }
         >
           <Text style={styles.actionText}>Buy</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionBtn, { backgroundColor: colors.negative }]}
-          onPress={() => navigation.navigate("Sell", { metal })}
+          onPress={() =>
+            navigation.navigate("Sell", {
+              metal: { name: metal.name, price: currentPrice },
+            })
+          }
         >
           <Text style={styles.actionText}>Sell</Text>
         </TouchableOpacity>
@@ -117,7 +129,7 @@ export default function MetalDetailScreen({ route, navigation }) {
               {item.type}
             </Text>
             <Text>{item.qty}g</Text>
-            <Text>${item.value.toFixed(2)}</Text>
+            <Text>${Number(item.value).toFixed(2)}</Text>
             <Text style={{ color: "#aaa" }}>{item.date}</Text>
           </View>
         )}
@@ -140,7 +152,6 @@ const styles = StyleSheet.create({
   },
   back: { fontSize: 20, color: "#fff" },
   title: { fontSize: 20, fontWeight: "bold", color: "#fff" },
-  favorite: { fontSize: 20, color: "#FFD700" },
   price: {
     fontSize: 32,
     fontWeight: "bold",
@@ -170,10 +181,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#222",
   },
   rangeActive: { backgroundColor: colors.primary },
+  position: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 8,
+    marginBottom: 6,
+  },
+  posText: { color: "#ddd" },
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 20,
+    marginVertical: 14,
   },
   actionBtn: {
     flex: 1,

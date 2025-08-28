@@ -10,7 +10,7 @@ import colors from "../theme/colors";
 import { usePortfolio } from "../context/PortfolioContext";
 
 export default function BuyScreen({ route, navigation }) {
-  const { metal } = route.params;
+  const { metal } = route.params; 
   const { buyMetal } = usePortfolio();
   const [qty, setQty] = useState("");
 
@@ -25,7 +25,9 @@ export default function BuyScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Buy {metal.name}</Text>
-      <Text style={styles.price}>Current Price: ${metal.price}</Text>
+      <Text style={styles.price}>
+        Current Price: ${Number(metal.price).toFixed(2)}
+      </Text>
 
       <TextInput
         style={styles.input}

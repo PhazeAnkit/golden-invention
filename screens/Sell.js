@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import colors from "../theme/colors";
 import { usePortfolio } from "../context/PortfolioContext";
 
@@ -19,7 +25,9 @@ export default function SellScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sell {metal.name}</Text>
-      <Text style={styles.price}>Current Price: ${metal.price}</Text>
+      <Text style={styles.price}>
+        Current Price: ${Number(metal.price).toFixed(2)}
+      </Text>
 
       <TextInput
         style={styles.input}
@@ -30,7 +38,10 @@ export default function SellScreen({ route, navigation }) {
         onChangeText={setQty}
       />
 
-      <TouchableOpacity style={[styles.btn, { backgroundColor: colors.negative }]} onPress={handleSell}>
+      <TouchableOpacity
+        style={[styles.btn, { backgroundColor: colors.negative }]}
+        onPress={handleSell}
+      >
         <Text style={styles.btnText}>Confirm Sell</Text>
       </TouchableOpacity>
     </View>

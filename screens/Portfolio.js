@@ -14,12 +14,22 @@ import { usePortfolio } from "../context/PortfolioContext";
 export default function PortfolioScreen({ navigation }) {
   const { holdings } = usePortfolio();
 
-  const totalValue = holdings.reduce(
-    (sum, m) => sum + m.qty * m.currentPrice,
-    0
-  );
+  const safeHoldings = Array.isArray(holdings) ? holdings : [];
 
-  const portfolioGrowth = [2000, 2500, 2700, 2600, 3000, totalValue];
+  const totalValue = safeHoldings.reduce((sum, m) => {
+    const qty = Number(m.qty) || 0;
+    const price = Number(m.currentPrice) || 0;
+    return sum + qty * price;
+  }, 0);
+
+  const portfolioGrowth = [
+    2000,
+    2500,
+    2700,
+    2600,
+    3000,
+    Number(totalValue) || 0,
+  ];
 
   return (
     <View style={styles.container}>
@@ -48,28 +58,37 @@ export default function PortfolioScreen({ navigation }) {
       />
 
       <FlatList
-        data={holdings}
+        data={safeHoldings}
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => {
-          const currentValue = item.qty * item.currentPrice;
-          const invested = item.qty * item.avgBuy;
+          const qty = Number(item.qty) || 0;
+          const currentPrice = Number(item.currentPrice) || 0;
+          const invested = Number(item.totalCost) || 0;
+          const currentValue = qty * currentPrice;
           const profit = currentValue - invested;
-          const profitPct = ((profit / invested) * 100).toFixed(2);
+          const profitPct =
+            invested > 0 ? ((profit / invested) * 100).toFixed(2) : "0.00";
+
+          const avgBuy = qty > 0 ? invested / qty : 0;
 
           return (
             <TouchableOpacity
               style={styles.card}
               onPress={() =>
-                navigation.navigate("MetalDetail", { metal: item })
+                navigation.navigate("MetalDetail", {
+                  metal: {
+                    name: item.name,
+                    price: currentPrice,
+                    change: 0,
+                  },
+                })
               }
             >
               <Text style={styles.metal}>{item.name}</Text>
-              <Text style={styles.detail}>Qty: {item.qty}</Text>
+              <Text style={styles.detail}>Qty: {qty}</Text>
+              <Text style={styles.detail}>Avg Buy: ${avgBuy.toFixed(2)}</Text>
               <Text style={styles.detail}>
-                Avg Buy: ${item.avgBuy.toFixed(2)}
-              </Text>
-              <Text style={styles.detail}>
-                Current: ${item.currentPrice.toFixed(2)}
+                Current: ${currentPrice.toFixed(2)}
               </Text>
               <Text
                 style={[
@@ -82,6 +101,11 @@ export default function PortfolioScreen({ navigation }) {
             </TouchableOpacity>
           );
         }}
+        ListEmptyComponent={
+          <Text style={{ color: "#777", textAlign: "center", marginTop: 12 }}>
+            No holdings yet. Use Buy on a metal to get started.
+          </Text>
+        }
       />
     </View>
   );
