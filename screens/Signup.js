@@ -7,11 +7,21 @@ import {
   StyleSheet,
 } from "react-native";
 import colors from "../theme/colors";
+import { useAuth } from "../context/AuthContext";
 
 export default function SignupScreen({ navigation }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSignup = () => {
+    if (!email.trim() || !password.trim() || password !== confirmPassword) {
+      return;
+    }
+    // Instead of replace("Main"), just set the user
+    login(email);
+  };
 
   return (
     <View style={styles.container}>
@@ -44,10 +54,7 @@ export default function SignupScreen({ navigation }) {
         onChangeText={setConfirmPassword}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.replace("Main")}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 

@@ -1,14 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import colors from "../theme/colors";
 
-export default function SplashScreen({ navigation }) {
-  useEffect(() => {
-    setTimeout(() => {
-      navigation.replace("Auth");
-    }, 2000);
-  }, []);
-
+export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>PreciousX</Text>

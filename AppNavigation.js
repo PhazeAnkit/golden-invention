@@ -5,14 +5,13 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import DashboardScreen from "./screens/Dashboard";
 import PortfolioScreen from "./screens/Portfolio";
-import AIHelperScreen from "./screens/AIHelper";
+import AiAssistantScreen from "./screens/AIHelper";
 import SplashScreen from "./screens/Splash";
 import LoginScreen from "./screens/Login";
 import SignupScreen from "./screens/Signup";
-import colors from "./theme/colors";
 import MetalDetailScreen from "./screens/MetalDetail";
-import BuyScreen from "./screens/Buy";
-import SellScreen from "./screens/Sell";
+import colors from "./theme/colors";
+import { useAuth } from "./context/AuthContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -52,7 +51,7 @@ function TabNavigator() {
       />
       <Tab.Screen
         name="AIHelper"
-        component={AIHelperScreen}
+        component={AiAssistantScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="sparkles-outline" color={color} size={size} />
@@ -73,14 +72,22 @@ function TabNavigator() {
 }
 
 export default function AppNavigator() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <SplashScreen />; // show splash while loading session
+  }
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="Auth" component={AuthNavigator} />
-      <Stack.Screen name="Main" component={TabNavigator} />
-      <Stack.Screen name="MetalDetail" component={MetalDetailScreen} />
-      <Stack.Screen name="Buy" component={BuyScreen} />
-      <Stack.Screen name="Sell" component={SellScreen} />
+      {user ? (
+        <>
+          <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen name="MetalDetail" component={MetalDetailScreen} />
+        </>
+      ) : (
+        <Stack.Screen name="Auth" component={AuthNavigator} />
+      )}
     </Stack.Navigator>
   );
 }

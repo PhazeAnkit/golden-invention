@@ -7,10 +7,19 @@ import {
   StyleSheet,
 } from "react-native";
 import colors from "../theme/colors";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen({ navigation }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    if (!email.trim() || !password.trim()) {
+      return;
+    }
+    login(email);
+  };
 
   return (
     <View style={styles.container}>
@@ -34,10 +43,7 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.replace("Main")}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 

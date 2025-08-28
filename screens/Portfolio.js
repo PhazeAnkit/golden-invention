@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -9,34 +8,39 @@ import {
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import colors from "../theme/colors";
-import { usePortfolio } from "../context/PortfolioContext";
+import { useAuth } from "../context/AuthContext";
 
-export default function PortfolioScreen({ navigation }) {
-  const { holdings } = usePortfolio();
-
-  const safeHoldings = Array.isArray(holdings) ? holdings : [];
-
-  const totalValue = safeHoldings.reduce((sum, m) => {
-    const qty = Number(m.qty) || 0;
-    const price = Number(m.currentPrice) || 0;
-    return sum + qty * price;
-  }, 0);
-
-  const portfolioGrowth = [
-    2000,
-    2500,
-    2700,
-    2600,
-    3000,
-    Number(totalValue) || 0,
+export default function PortfolioScreen() {
+  // Fake holdings (later, update via Buy/Sell flow)
+  const holdings = [
+    { name: "Gold", qty: 10, avgBuy: 1850, currentPrice: 1925 },
+    { name: "Silver", qty: 200, avgBuy: 22, currentPrice: 23.5 },
+    { name: "Platinum", qty: 5, avgBuy: 870, currentPrice: 890 },
   ];
+
+  // Portfolio value and growth data
+  const totalValue = holdings.reduce(
+    (sum, m) => sum + m.qty * m.currentPrice,
+    0
+  );
+
+  const { logout } = useAuth();
+
+  const portfolioGrowth = [2000, 2500, 2700, 2600, 3000, totalValue]; // fake history
 
   return (
     <View style={styles.container}>
+      {/* Logout button */}
+      <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
+
+      {/* Portfolio summary */}
       <Text style={styles.heading}>My Portfolio</Text>
       <Text style={styles.value}>${totalValue.toFixed(2)}</Text>
       <Text style={styles.subText}>Total Value</Text>
 
+      {/* Chart */}
       <LineChart
         data={{
           labels: ["Jan", "Feb", "Mar", "Apr", "May", "Now"],
@@ -57,38 +61,25 @@ export default function PortfolioScreen({ navigation }) {
         style={styles.chart}
       />
 
+      {/* Holdings List */}
       <FlatList
-        data={safeHoldings}
+        data={holdings}
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => {
-          const qty = Number(item.qty) || 0;
-          const currentPrice = Number(item.currentPrice) || 0;
-          const invested = Number(item.totalCost) || 0;
-          const currentValue = qty * currentPrice;
+          const currentValue = item.qty * item.currentPrice;
+          const invested = item.qty * item.avgBuy;
           const profit = currentValue - invested;
-          const profitPct =
-            invested > 0 ? ((profit / invested) * 100).toFixed(2) : "0.00";
-
-          const avgBuy = qty > 0 ? invested / qty : 0;
+          const profitPct = ((profit / invested) * 100).toFixed(2);
 
           return (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() =>
-                navigation.navigate("MetalDetail", {
-                  metal: {
-                    name: item.name,
-                    price: currentPrice,
-                    change: 0,
-                  },
-                })
-              }
-            >
+            <View style={styles.card}>
               <Text style={styles.metal}>{item.name}</Text>
-              <Text style={styles.detail}>Qty: {qty}</Text>
-              <Text style={styles.detail}>Avg Buy: ${avgBuy.toFixed(2)}</Text>
+              <Text style={styles.detail}>Qty: {item.qty}</Text>
               <Text style={styles.detail}>
-                Current: ${currentPrice.toFixed(2)}
+                Avg Buy: ${item.avgBuy.toFixed(2)}
+              </Text>
+              <Text style={styles.detail}>
+                Current: ${item.currentPrice.toFixed(2)}
               </Text>
               <Text
                 style={[
@@ -98,14 +89,9 @@ export default function PortfolioScreen({ navigation }) {
               >
                 P/L: ${profit.toFixed(2)} ({profitPct}%)
               </Text>
-            </TouchableOpacity>
+            </View>
           );
         }}
-        ListEmptyComponent={
-          <Text style={{ color: "#777", textAlign: "center", marginTop: 12 }}>
-            No holdings yet. Use Buy on a metal to get started.
-          </Text>
-        }
       />
     </View>
   );
@@ -123,6 +109,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 12,
   },
+  logoutBtn: {
+    marginTop: 20,
+    backgroundColor: "red",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  logoutText: { color: "#fff", fontWeight: "bold" },
+
   metal: { fontSize: 18, fontWeight: "bold", color: "#fff" },
   detail: { fontSize: 14, color: "#aaa" },
   profit: { fontSize: 16, fontWeight: "600", marginTop: 5 },
