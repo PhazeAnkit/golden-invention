@@ -1,13 +1,16 @@
+// screens/LoginScreen.js
 import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
+  KeyboardAvoidingView,
 } from "react-native";
-import colors from "../theme/colors";
+import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "../context/AuthContext";
+import styles from "./LoginScreen.styles";
+import BrandLogo from "../components/BrandLogo";
 
 export default function LoginScreen({ navigation }) {
   const { login } = useAuth();
@@ -15,85 +18,52 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (!email.trim() || !password.trim()) {
-      return;
-    }
+    if (!email.trim() || !password.trim()) return;
     login(email);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Login to your account</Text>
+    <LinearGradient
+      colors={["#121212", "#1E1E1E", "#0A0A0A"]}
+      style={styles.container}
+    >
+      <KeyboardAvoidingView behavior="padding" style={styles.inner}>
+        <BrandLogo size={42} />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor={colors.subText}
-        value={email}
-        onChangeText={setEmail}
-      />
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>Login to your account</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor={colors.subText}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#888"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#888"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.forgot}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
-        <Text style={styles.link}>Don’t have an account? Sign Up</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+          <Text style={styles.link}>
+            Don’t have an account?{" "}
+            <Text style={styles.linkHighlight}>Sign Up</Text>
+          </Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.subText,
-    marginBottom: 30,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 15,
-    color: colors.text,
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 12,
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  link: {
-    color: colors.primary,
-    fontSize: 14,
-    textAlign: "center",
-  },
-});

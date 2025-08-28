@@ -1,30 +1,20 @@
+// screens/SplashScreen.js
 import React from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { View, ActivityIndicator } from "react-native";
+import BrandLogo from "../components/BrandLogo";
 import colors from "../theme/colors";
+import styles from "./SplashScreen.styles";
 
 export default function SplashScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>PreciousX</Text>
+    <LinearGradient colors={["#121212", "#1E1E1E"]} style={styles.container}>
+      <BrandLogo size={40} />
       <ActivityIndicator
         size="large"
         color={colors.primary}
-        style={{ marginTop: 20 }}
+        style={styles.loader}
       />
-    </View>
+    </LinearGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logo: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.primary,
-  },
-});

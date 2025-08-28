@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -75,6 +75,20 @@ function TabNavigator() {
 
 export default function AppNavigator() {
   const { user, loading } = useAuth();
+
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500); // min splash time = 2.5s
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || showSplash) {
+    return <SplashScreen />;
+  }
 
   if (loading) {
     return <SplashScreen />;
