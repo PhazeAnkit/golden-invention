@@ -12,6 +12,8 @@ import SignupScreen from "./screens/Signup";
 import MetalDetailScreen from "./screens/MetalDetail";
 import colors from "./theme/colors";
 import { useAuth } from "./context/AuthContext";
+import BuyScreen from "./screens/Buy";
+import SellScreen from "./screens/Sell"
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -75,7 +77,7 @@ export default function AppNavigator() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <SplashScreen />; // show splash while loading session
+    return <SplashScreen />;
   }
 
   return (
@@ -84,6 +86,8 @@ export default function AppNavigator() {
         <>
           <Stack.Screen name="Main" component={TabNavigator} />
           <Stack.Screen name="MetalDetail" component={MetalDetailScreen} />
+          <Stack.Screen name="Buy" component={BuyScreen} />
+          <Stack.Screen name="Sell" component={SellScreen} />
         </>
       ) : (
         <Stack.Screen name="Auth" component={AuthNavigator} />

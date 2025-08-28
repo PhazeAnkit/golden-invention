@@ -20,7 +20,8 @@ const DashboardScreen = ({ navigation }) => {
           metal={metal.name}
           price={metal.price}
           change={metal.change}
-            onPress={() => navigation.navigate("MetalDetail", { metal })}        />
+          onPress={() => navigation.navigate("MetalDetail", { metal })}
+        />
       ))}
     </ScrollView>
   );

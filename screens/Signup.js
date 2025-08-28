@@ -19,7 +19,6 @@ export default function SignupScreen({ navigation }) {
     if (!email.trim() || !password.trim() || password !== confirmPassword) {
       return;
     }
-    // Instead of replace("Main"), just set the user
     login(email);
   };
 

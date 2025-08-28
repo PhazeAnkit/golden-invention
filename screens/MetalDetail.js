@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import { LineChart } from "react-native-chart-kit";
 import colors from "../theme/colors";
 import { usePortfolio } from "../context/PortfolioContext";
+import MetalChart from "../components/MetalChart";
+import { fetchMetalHistory } from "../services/metalApi";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -29,11 +31,22 @@ export default function MetalDetailScreen({ route, navigation }) {
     [transactions, metal.name]
   );
 
-  const priceHistory = [1800, 1810, 1790, 1820, 1812, currentPrice || 1805];
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadHistory();
+  }, [range]);
+
+  const loadHistory = async () => {
+    setLoading(true);
+    const data = await fetchMetalHistory(metal.name, range);
+    setHistory(data);
+    setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>←</Text>
@@ -48,29 +61,12 @@ export default function MetalDetailScreen({ route, navigation }) {
         {metal.change > 0 ? `+${metal.change}%` : `${metal.change}%`}
       </Text>
 
-      {/* Chart */}
-      <LineChart
-        data={{
-          labels: ["1", "2", "3", "4", "5", "Now"],
-          datasets: [{ data: priceHistory }],
-        }}
-        width={screenWidth - 32}
-        height={220}
-        yAxisLabel="$"
-        chartConfig={{
-          backgroundColor: "#000",
-          backgroundGradientFrom: "#111",
-          backgroundGradientTo: "#111",
-          decimalPlaces: 2,
-          color: () => colors.primary,
-          labelColor: (opacity = 1) => `rgba(255,255,255,${opacity})`,
-          propsForDots: { r: "4", strokeWidth: "2", stroke: colors.primary },
-        }}
-        bezier
-        style={styles.chart}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : (
+        <MetalChart title={`${metal.name} Price (${range})`} data={history} />
+      )}
 
-      {/* Range */}
       <View style={styles.rangeContainer}>
         {["1D", "1W", "1M", "1Y"].map((r) => (
           <TouchableOpacity
@@ -83,14 +79,12 @@ export default function MetalDetailScreen({ route, navigation }) {
         ))}
       </View>
 
-      {/* Position summary */}
       <View style={styles.position}>
         <Text style={styles.posText}>Owned: {ownedQty}</Text>
         <Text style={styles.posText}>Avg Buy: ${avgBuy.toFixed(2)}</Text>
         <Text style={styles.posText}>Invested: ${invested.toFixed(2)}</Text>
       </View>
 
-      {/* Buy / Sell */}
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={[styles.actionBtn, { backgroundColor: colors.primary }]}
@@ -114,7 +108,6 @@ export default function MetalDetailScreen({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Recent Transactions */}
       <Text style={styles.sectionTitle}>Recent Transactions</Text>
       <FlatList
         data={metalTxns}
@@ -163,11 +156,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#39FF14",
     marginBottom: 16,
-  },
-  chart: {
-    borderRadius: 12,
-    marginVertical: 10,
-    alignSelf: "center",
   },
   rangeContainer: {
     flexDirection: "row",
