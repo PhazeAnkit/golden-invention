@@ -1,43 +1,64 @@
-import React from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
-import colors from "../theme/colors";
-import MetalCard from "../components/MetalCard";
+import React, { useContext } from "react";
+import { ScrollView, View } from "react-native";
+import { SafeAreaView,StatusBar } from "react-native-safe-area-context";
+import { MetalsContext } from "../context/MetalsContext";
+
+import DashboardHeader from "../components/DashboardHeader";
+import QuickActionsRow from "../components/QuickActionsRow";
+import PortfolioSummaryCard from "../components/PortfolioSummaryCard";
+import MetalMarketCard from "../components/MetalMarketCard";
+
+import styles from "./Dashboard.styles";
 
 const DashboardScreen = ({ navigation }) => {
-  const metals = [
-    { name: "Gold", price: 1925, change: 1.2 },
-    { name: "Silver", price: 23.5, change: -0.8 },
-    { name: "Platinum", price: 890, change: 0.4 },
-    { name: "Palladium", price: 1250, change: -1.1 },
-    { name: "Rhodium", price: 4950, change: 0.9 },
-  ];
+  const { metals, loading, refresh } = useContext(MetalsContext);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {metals.map((metal, index) => (
-        <MetalCard
-          key={index}
-          metal={metal.name}
-          price={metal.price}
-          change={metal.change}
-          onPress={() => navigation.navigate("MetalDetail", { metal })}
+    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+      <StatusBar />
+      <ScrollView contentContainerStyle={styles.container}>
+        
+        <DashboardHeader onRefresh={refresh} loading={loading} />
+
+        <QuickActionsRow
+          onBuy={() => navigation.navigate("Buy")}
+          onSell={() => navigation.navigate("Sell")}
+          onAI={() => navigation.navigate("AIHelper")}
+          onSearch={() => {}}
         />
-      ))}
-    </ScrollView>
+
+        {/* Portfolio Summary */}
+        <PortfolioSummaryCard
+          balance={12340.0}
+          pnl={2.3}
+          sparkline={[11, 12, 10, 12.5, 13.2, 13.8, 13.5]}
+        />
+
+        {/* Section Title */}
+        <View style={styles.sectionHeader}>
+          <View style={styles.dot} />
+          <View style={styles.sectionTitleWrap}>
+            <View style={styles.sectionTitleBar} />
+          </View>
+        </View>
+
+        {/* Market Grid */}
+        <View style={styles.grid}>
+          {(metals || []).map((m, i) => (
+            <MetalMarketCard
+              key={m.name + i}
+              name={m.name}
+              price={m.price}
+              change={m.change}
+              onPress={() =>
+                navigation.navigate("MetalDetail", { metal: m, defaultRange: "1D" })
+              }
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    padding: 12,
-  },
-});
 
 export default DashboardScreen;
