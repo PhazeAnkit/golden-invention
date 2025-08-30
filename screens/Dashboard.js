@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
-import { ScrollView, View, StatusBar } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+
+import { ScrollView, StatusBar, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MetalsContext } from "../context/MetalsContext";
 
 import DashboardHeader from "../components/DashboardHeader";
@@ -17,7 +18,6 @@ const DashboardScreen = ({ navigation }) => {
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.container}>
-        
         {/* Header */}
         <DashboardHeader onRefresh={refresh} loading={loading} />
 
@@ -53,7 +53,10 @@ const DashboardScreen = ({ navigation }) => {
               price={m.price}
               change={m.change}
               onPress={() =>
-                navigation.navigate("MetalDetail", { metal: m, defaultRange: "1D" })
+                navigation.navigate("MetalDetail", {
+                  metal: m,
+                  defaultRange: "1D",
+                })
               }
             />
           ))}
