@@ -1,15 +1,14 @@
-// services/metalApi.js
 import { METAL_SYMBOL_MAP } from "./metalSymbols";
 
-const API_KEY = "d8b2ea16b0841eb7eda2016572e57e59"; // move to .env later
+const API_KEY = "8305f6c1801eec6b2c3aa3187e0d6ceb"; // move to .env later
 
 export async function fetchMetalHistory(
   metalNameOrSymbol,
   range = "1D",
-  base = "USD"
+  base = "INR"
 ) {
   try {
-    let sym = metalNameOrSymbol?.toUpperCase?.();
+    let sym = "INR"+metalNameOrSymbol?.toUpperCase?.();
     if (METAL_SYMBOL_MAP[metalNameOrSymbol?.toLowerCase?.()]) {
       sym = METAL_SYMBOL_MAP[metalNameOrSymbol.toLowerCase()];
     }
@@ -24,7 +23,7 @@ export async function fetchMetalHistory(
     if (range === "1D") startDate.setDate(today.getDate() - 1);
     else if (range === "1W") startDate.setDate(today.getDate() - 5);
     else if (range === "1M") startDate.setDate(today.getDate() - 5);
-    else if (range === "1Y") startDate.setDate(today.getDate() - 5); // free plan fallback
+    else if (range === "1Y") startDate.setDate(today.getDate() - 5);
 
     const start = startDate.toISOString().split("T")[0];
     const end = today.toISOString().split("T")[0];
@@ -41,10 +40,10 @@ export async function fetchMetalHistory(
     });
 
     const res = await fetch(url);
-    console.log("[metalApi] HTTP ok?", res.ok, "status:", res.status);
+    console.log("[metalApi] HTTP ok?", res.ok, "status:", res);
 
     const json = await res.json();
-    console.log("[metalApi] JSON top-level keys:", Object.keys(json));
+    console.log("[metalApi] JSON top-level keys:", json);
 
     if (!json.success) {
       console.error("[metalApi] API reported failure:", json);
@@ -54,7 +53,7 @@ export async function fetchMetalHistory(
     const prices = json.rates
       ? Object.entries(json.rates).map(([date, data]) => ({
           x: date,
-          y: data[sym],
+          y: data["INR"+sym],
         }))
       : [];
 

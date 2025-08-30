@@ -1,15 +1,14 @@
 import React, { useContext } from "react";
+
 import { ScrollView, StatusBar, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MetalsContext } from "../context/MetalsContext";
 
-// Dashboard components
 import DashboardHeader from "../components/DashboardHeader";
 import QuickActionsRow from "../components/QuickActionsRow";
 import PortfolioSummaryCard from "../components/PortfolioSummaryCard";
 import MetalMarketCard from "../components/MetalMarketCard";
 
-// Styles
 import styles from "./Dashboard.styles";
 
 const DashboardScreen = ({ navigation }) => {
