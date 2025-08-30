@@ -101,18 +101,26 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 6,
   },
-  card: {
-    width: CARD,
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    padding: 14,
-    marginTop: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+  cardWrap: {
+    flex: 1,
+    margin: 8,
+    borderRadius: 16,
+    overflow: "hidden", 
   },
+
+  card: {
+    margin: 5,
+    padding: 16,
+    borderRadius: 16,
+    minWidth: 150,
+    minHeight: 100,
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+
   cardHeaderRow: { flexDirection: "row", justifyContent: "space-between" },
   cardTitle: { color: colors.text, fontSize: 18, fontWeight: "700" },
   cardPrice: {
